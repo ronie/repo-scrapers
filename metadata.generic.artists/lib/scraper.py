@@ -30,10 +30,10 @@ from .theaudiodb import theaudiodb_mvids
 from .wikipedia import wikipedia_artistdetails
 from .utils import *
 
+ADDON = xbmcaddon.Addon()
 ADDONID = xbmcaddon.Addon().getAddonInfo('id')
 ADDONNAME = xbmcaddon.Addon().getAddonInfo('name')
 ADDONVERSION = xbmcaddon.Addon().getAddonInfo('version')
-
 
 def log(txt):
     message = '%s: %s' % (ADDONID, txt)
@@ -47,6 +47,8 @@ def get_data(url, jsonformat, retry=True):
             api_timeout('discogstime')
         headers = {}
         headers['User-Agent'] = '%s/%s ( http://kodi.tv )' % (ADDONNAME, ADDONVERSION)
+        if url.startswith('https://api.discogs.com/'):
+            headers['Accept'] = 'application/vnd.discogs.v2.plaintext+json'
         req = urllib.request.Request(url, headers=headers)
         resp = urllib.request.urlopen(req, timeout=5)
         respdata = resp.read()
@@ -208,11 +210,18 @@ class Scraper():
 
     def parse_settings(self, data):
         settings = json.loads(data)
+
         # note: path settings are taken from the db, they may not reflect the current settings.xml file
         self.bio = settings['bio']
         self.discog = settings['discog']
         self.genre = settings['genre']
         self.lang = settings['lang']
+        self.artistlang = settings['artistlang']
+
+        self.artistlangcustom = settings['artistlangcustom']
+        if not self.artistlangcustom:
+            self.artistlangcustom = xbmc.getLanguage(xbmc.ISO_639_1, region=True).lower()
+
         self.mood = settings['mood']
         self.style = settings['style']
         self.inaccurate = settings['inaccurate']
@@ -304,7 +313,19 @@ class Scraper():
         result = get_data(url, json)
         if not result:
             return
-        artistresults = artistscraper(result)
+
+        if site == 'musicbrainz':
+            locale = self.artistlang.lower()
+            if locale == 'original':
+                locale = None
+            elif locale == 'current':
+                locale = xbmc.getLanguage(xbmc.ISO_639_1, region=True).lower()
+            elif locale == 'custom':
+                locale = self.artistlangcustom.lower()
+            artistresults = artistscraper(result, locale)
+        else:
+            artistresults = artistscraper(result)
+
         if not artistresults:
             return
         details[site] = artistresults

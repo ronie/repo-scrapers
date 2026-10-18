@@ -1,3 +1,10 @@
+v1.0.21
+- musicbrainz: add artist sort-name
+- musicbrainz: add preferred language for artist names
+
+v1.0.20
+- update regex code to prevent errors in the kodi logfile
+
 v1.0.19
 - language updates
 

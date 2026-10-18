@@ -9,7 +9,7 @@ AUDIODBMVIDS = 'mvid-mb.php?i=%s'
 
 MUSICBRAINZURL = 'https://musicbrainz.org/ws/2/artist/%s'
 MUSICBRAINZSEARCH = '?query="%s"&fmt=json'
-MUSICBRAINZDETAILS = '%s?inc=url-rels+release-groups&type=album&fmt=json'
+MUSICBRAINZDETAILS = '%s?inc=url-rels+release-groups+aliases&type=album&fmt=json'
 
 DISCOGSKEY = 'zACPgktOmNegwbwKWMaC'
 DISCOGSSECRET = 'wGuSOeMtfdkQxtERKQKPquyBwExSHdQq'
